@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Submissões - WEBDEV</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f4f7f9; color: #333; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #0056b3; }
+        #container { max-width: 900px; margin: auto; }
+        .card { background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; padding: 20px; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        .card-header { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .card-header .ip { font-weight: bold; font-size: 1.1em; color: #333; }
+        .card-header .timestamp { font-size: 0.9em; color: #888; }
+        .card-body pre { background-color: #eef2f5; padding: 15px; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; }
+        #contador { text-align: center; font-size: 1.2em; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Painel de Submissões em Tempo Real</h1>
+        <p id="contador">Total de submissões: <strong>0</strong></p>
+        <div id="submissoes-lista">
+            </div>
+    </div>
+
+    <script>
+        const listaEl = document.getElementById('submissoes-lista');
+        const contadorEl = document.querySelector('#contador strong');
+        const API_URL = 'http://localhost:4000/submissoes'; // Endereço do seu servidor
+
+        async function buscarSubmissoes() {
+            try {
+                const response = await fetch(API_URL);
+                const submissoes = await response.json();
+
+                // Limpa a lista atual para redesenhar
+                listaEl.innerHTML = '';
+                
+                // Atualiza o contador
+                contadorEl.textContent = submissoes.length;
+
+                // Cria um card para cada submissão
+                submissoes.forEach(sub => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+
+                    const dadosFormatados = JSON.stringify(sub.dados, null, 2);
+
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <span class="ip">IP: ${sub.ip}</span>
+                            <span class="timestamp">${sub.timestamp}</span>
+                        </div>
+                        <div class="card-body">
+                            <strong>Dados Enviados:</strong>
+                            <pre>${dadosFormatados}</pre>
+                        </div>
+                    `;
+                    listaEl.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Erro ao buscar dados:', error);
+                listaEl.innerHTML = '<p style="color: red; text-align: center;">Erro ao conectar com o servidor.</p>';
+            }
+        }
+
+        // Busca os dados pela primeira vez ao carregar a página
+        buscarSubmissoes();
+
+        // E depois, busca a cada 3 segundos para atualizar
+        setInterval(buscarSubmissoes, 3000);
+    </script>
+</body>
+</html>
+
