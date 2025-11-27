@@ -3,11 +3,8 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
-const PORT = 4000; // A porta onde seu servidor vai rodar
+const PORT = 4000; 
 
-// --- Armazenamento em Memória ---
-// Um array simples para guardar as submissões.
-// Em um projeto real, isso seria um banco de dados.
 const db = new sqlite3.Database('./dados.db', (err) =>{
     if(err){
         console.error('Erro ao conectar ao banco de dados: ', err.message);
